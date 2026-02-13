@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smily Dresses - Premium Store</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap');
+        
+        :root {
+            --primary: #d53f8c;
+            --secondary: #2d3748;
+            --bg-light: #fff5f7;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: var(--bg-light);
+            padding-bottom: 90px;
+        }
+
+        .nav-bottom {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: space-around;
+            padding: 15px 0;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.05);
+            z-index: 1000;
+            border-top: 1px solid #edf2f7;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #a0aec0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            width: 25%;
+        }
+
+        .nav-item.active {
+            color: var(--primary);
+            transform: translateY(-5px);
+        }
+
+        .page {
+            display: none;
+            animation: slideUp 0.4s ease-out;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .product-image {
+            aspect-ratio: 3/4;
+            object-fit: cover;
+            border-radius: 20px;
+        }
+
+        .size-btn {
+            border: 2px solid #edf2f7;
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            font-weight: bold;
+            transition: 0.2s;
+            background: white;
+        }
+
+        .size-btn.selected {
+            background-color: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            box-shadow: 0 4px 12px rgba(213, 63, 140, 0.3);
+        }
+
+        .cart-badge {
+            position: absolute;
+            top: -8px;
+            right: -12px;
+            background: #ff4d4d;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid white;
+        }
+
+        .glass-card {
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+            border: 1px solid rgba(255,255,255,0.8);
+        }
+
+        select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23d53f8c'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: left 1rem center;
+            background-size: 1.5em;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="sticky top-0 z-50 bg-white/80 backdrop-blur-md p-5 flex justify-between items-center border-b border-pink-50">
+        <div>
+            <span class="text-xs text-gray-400 block uppercase tracking-widest">Premium Collection</span>
+            <h1 class="text-2xl font-extrabold text-gray-800">Smily<span class="text-pink-500">Dresses</span></h1>
+        </div>
+        <div class="relative cursor-pointer" onclick="showPage('cart')">
+            <div class="bg-gray-100 p-3 rounded-2xl">
+                <i class="fas fa-shopping-bag text-xl text-gray-700"></i>
+            </div>
+            <span id="cart-count" class="cart-badge">0</span>
+        </div>
+    </header>
+
+    <main class="p-5 max-w-2xl mx-auto">
+        
+        <!-- Home Page -->
+        <section id="home" class="page active space-y-6">
+            <div class="relative rounded-[32px] overflow-hidden h-[400px]">
+                <img src="https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?w=800" class="w-full h-full object-cover">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex flex-col justify-end p-8">
+                    <h2 class="text-3xl font-bold text-white mb-2">تألقي كالملكات</h2>
+                    <p class="text-gray-200 mb-6">مجموعة حصرية من الفساتين التي تبرز جمالك في كل مناسبة.</p>
+                    <button onclick="showPage('shop')" class="bg-white text-black py-4 px-8 rounded-2xl font-bold w-max shadow-xl">ابدأي التسوق</button>
+                </div>
+            </div>
+            
+            <div class="glass-card p-6 text-center border-t-4 border-pink-500">
+                <h3 class="font-bold text-xl mb-2">لماذا Smily Dresses؟</h3>
+                <p class="text-gray-500 text-sm leading-relaxed">نحن نضمن لك جودة القماش، دقة التفصيل، وسرعة التوصيل لجميع الولايات بأسعار تنافسية.</p>
+            </div>
+        </section>
+
+        <!-- Shop Page -->
+        <section id="shop" class="page space-y-6">
+            <div class="flex justify-between items-end">
+                <h2 class="text-2xl font-bold">المتجر</h2>
+                <span class="text-pink-500 text-sm font-semibold">4 موديلات متوفرة</span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Product Card Template -->
+                <script>
+                    const productsData = [
+                        {id: 1, name: 'فستان الأميرة الوردي', price: 4500, img: 'image1.jpg', fallback: 'https://images.unsplash.com/photo-1539008835270-34909f299f06?w=500'},
+                        {id: 2, name: 'فستان الليل الأسود', price: 5800, img: 'image2.jpg', fallback: 'https://images.unsplash.com/photo-1568252542512-9fe8fe9c87bb?w=500'},
+                        {id: 3, name: 'فستان الياسمين الأبيض', price: 3200, img: 'image3.jpg', fallback: 'https://images.unsplash.com/photo-1496747611176-843222e1e57c?w=500'},
+                        {id: 4, name: 'فستان السهرة الزمردي', price: 6900, img: 'image4.jpg', fallback: 'https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?w=500'}
+                    ];
+                </script>
+                
+                <div id="products-grid" class="contents">
+                    <!-- JS will inject here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Cart/Checkout Page -->
+        <section id="cart" class="page space-y-6">
+            <h2 class="text-2xl font-bold mb-4">سلة المشتريات</h2>
+            
+            <div id="cart-items" class="space-y-4">
+                <!-- Items list -->
+            </div>
+
+            <div class="glass-card p-6 space-y-5">
+                <h3 class="font-bold text-lg flex items-center gap-2">
+                    <i class="fas fa-truck text-pink-500"></i> تفاصيل الشحن
+                </h3>
+                
+                <div class="space-y-4">
+                    <input type="text" id="customer-name" class="w-full p-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-pink-500 outline-none" placeholder="الاسم الكامل">
+                    <input type="tel" id="customer-phone" class="w-full p-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-pink-500 outline-none" placeholder="رقم الهاتف">
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="relative">
+                            <select id="wilaya" class="w-full p-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-pink-500 outline-none font-bold" onchange="calculateShipping()">
+                                <option value="">-- اختر الولاية --</option>
+                            </select>
+                        </div>
+                        <input type="text" id="commune" class="w-full p-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-pink-500 outline-none" placeholder="البلدية">
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <label class="flex items-center justify-center p-4 rounded-2xl bg-gray-50 border-2 border-transparent cursor-pointer has-[:checked]:border-pink-500 has-[:checked]:bg-pink-50 transition-all">
+                            <input type="radio" name="delivery-type" value="home" checked onchange="calculateShipping()" class="hidden">
+                            <span class="font-bold">توصيل للمنزل</span>
+                        </label>
+                        <label class="flex items-center justify-center p-4 rounded-2xl bg-gray-50 border-2 border-transparent cursor-pointer has-[:checked]:border-pink-500 has-[:checked]:bg-pink-50 transition-all">
+                            <input type="radio" name="delivery-type" value="office" onchange="calculateShipping()" class="hidden">
+                            <span class="font-bold">استلام مكتب</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-card p-6 space-y-3">
+                <div class="flex justify-between text-gray-500">
+                    <span>مجموع المنتجات</span>
+                    <span id="subtotal">0 د.ج</span>
+                </div>
+                <div class="flex justify-between text-gray-500">
+                    <span>سعر التوصيل</span>
+                    <span id="shipping-cost">0 د.ج</span>
+                </div>
+                <div class="flex justify-between font-extrabold text-xl text-gray-800 pt-3 border-t">
+                    <span>الإجمالي</span>
+                    <span id="total-price" class="text-pink-600">0 د.ج</span>
+                </div>
+            </div>
+
+            <button onclick="checkout()" class="w-full bg-green-500 hover:bg-green-600 text-white py-5 rounded-2xl font-black text-lg shadow-xl shadow-green-100 flex items-center justify-center gap-3 transition-all transform active:scale-95">
+                <i class="fab fa-whatsapp text-2xl"></i> إتمام الطلب الآن
+            </button>
+        </section>
+    </main>
+
+    <!-- Bottom Nav -->
+    <nav class="nav-bottom">
+        <div class="nav-item active" onclick="showPage('home')" id="nav-home">
+            <i class="fas fa-home text-xl mb-1"></i>
+            <span class="text-[10px] font-bold">الرئيسية</span>
+        </div>
+        <div class="nav-item" onclick="showPage('shop')" id="nav-shop">
+            <i class="fas fa-th-large text-xl mb-1"></i>
+            <span class="text-[10px] font-bold">المتجر</span>
+        </div>
+        <div class="nav-item" onclick="showPage('cart')" id="nav-cart">
+            <i class="fas fa-shopping-basket text-xl mb-1"></i>
+            <span class="text-[10px] font-bold">السلة</span>
+        </div>
+    </nav>
+
+    <script>
+        const wilayas = [
+            "01-أدرار", "02-الشلف", "03-الأغواط", "04-أم البواقي", "05-باتنة", "06-بجاية", "07-بسكرة", "08-بشار", "09-البليدة", "10-البويرة",
+            "11-تمنراست", "12-تبسة", "13-تلمسان", "14-تيارت", "15-تيزي وزو", "16-الجزائر", "17-الجلفة", "18-جيجل", "19-سطيف", "20-سعيدة",
+            "21-سكيكدة", "22-سيدي بلعباس", "23-عنابة", "24-قالمة", "25-قسنطينة", "26-المدية", "27-مستغانم", "28-المسيلة", "29-معسكر", "30-ورقلة",
+            "31-وهران", "32-البيض", "33-إليزي", "34-برج بوعريريج", "35-بومرداس", "36-الطارف", "37-تندوف", "38-تيسمسيلت", "39-الوادي", "40-خنشلة",
+            "41-سوق أهراس", "42-تيبازة", "43-ميلة", "44-عين الدفلى", "45-النعامة", "46-عين تموشنت", "47-غرداية", "48-غليزان", "49-تيميمون", "50-برج باجي مختار",
+            "51-أولاد جلال", "52-بني عباس", "53-عين صالح", "54-عين قزام", "55-تقرت", "56-جانت", "57-المغير", "58-المنيعة"
+        ];
+
+        let cart = [];
+        let selectedSizes = { 1: 'L', 2: 'M', 3: 'S', 4: 'L' };
+
+        // UI Initialization
+        window.onload = () => {
+            renderProducts();
+            populateWilayas();
+            updateCartUI();
+        };
+
+        function renderProducts() {
+            const grid = document.getElementById('products-grid');
+            grid.innerHTML = productsData.map(p => `
+                <div class="glass-card p-4 flex flex-col">
+                    <img src="${p.img}" onerror="this.src='${p.fallback}'" class="product-image mb-4 shadow-md">
+                    <h3 class="font-extrabold text-lg mb-1">${p.name}</h3>
+                    <p class="text-pink-500 font-black text-xl mb-4">${p.price} د.ج</p>
+                    
+                    <div class="mb-4">
+                        <span class="text-xs text-gray-400 font-bold mb-2 block uppercase">اختر المقاس:</span>
+                        <div class="flex gap-2">
+                            ${['S', 'M', 'L', 'XL', 'XXL'].map(size => `
+                                <button onclick="selectSize(this, ${p.id}, '${size}')" 
+                                    class="size-btn ${selectedSizes[p.id] === size ? 'selected' : ''}">
+                                    ${size}
+                                </button>
+                            `).join('')}
+                        </div>
+                    </div>
+                    
+                    <button onclick="addToCart(${p.id}, '${p.name}', ${p.price}, '${p.img}')" 
+                        class="mt-auto bg-black text-white py-4 rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-gray-800 transition-colors">
+                        <i class="fas fa-plus-circle"></i> أضف للسلة
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function populateWilayas() {
+            const select = document.getElementById('wilaya');
+            wilayas.forEach(w => {
+                let opt = document.createElement('option');
+                opt.value = w;
+                opt.textContent = w;
+                select.appendChild(opt);
+            });
+        }
+
+        function selectSize(btn, pid, size) {
+            btn.parentElement.querySelectorAll('.size-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            selectedSizes[pid] = size;
+        }
+
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.getElementById('nav-' + pageId).classList.add('active');
+            window.scrollTo(0, 0);
+        }
+
+        function addToCart(id, name, price, img) {
+            const size = selectedSizes[id];
+            const existing = cart.find(i => i.id === id && i.size === size);
+            if (existing) existing.qty++;
+            else cart.push({ id, name, price, img, size, qty: 1 });
+            
+            updateCartUI();
+            notify("تمت الإضافة!");
+        }
+
+        function updateCartUI() {
+            const container = document.getElementById('cart-items');
+            document.getElementById('cart-count').innerText = cart.reduce((s, i) => s + i.qty, 0);
+            
+            if (cart.length === 0) {
+                container.innerHTML = `<div class="text-center py-20"><i class="fas fa-shopping-cart text-5xl text-gray-100 mb-4"></i><p class="text-gray-400">سلتك فارغة، تسوقي الآن!</p></div>`;
+            } else {
+                container.innerHTML = cart.map((item, index) => `
+                    <div class="glass-card p-4 flex gap-4 items-center">
+                        <img src="${item.img}" onerror="this.src='https://via.placeholder.com/100'" class="w-20 h-24 object-cover rounded-xl shadow-sm">
+                        <div class="flex-1">
+                            <h4 class="font-bold text-gray-800">${item.name}</h4>
+                            <div class="flex items-center gap-2 text-xs font-bold text-gray-400 mt-1 uppercase">
+                                <span class="bg-pink-50 text-pink-500 px-2 py-1 rounded-md">${item.size}</span>
+                                <span>الكمية: ${item.qty}</span>
+                            </div>
+                            <p class="text-pink-600 font-black mt-2">${item.price * item.qty} د.ج</p>
+                        </div>
+                        <button onclick="removeFromCart(${index})" class="text-red-300 hover:text-red-500 p-2"><i class="fas fa-trash-alt"></i></button>
+                    </div>
+                `).join('');
+            }
+            calculateShipping();
+        }
+
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            updateCartUI();
+        }
+
+        function calculateShipping() {
+            const wilaya = document.getElementById('wilaya').value;
+            const deliveryType = document.querySelector('input[name="delivery-type"]:checked').value;
+            let cost = 0;
+
+            if (wilaya) {
+                const code = parseInt(wilaya.substring(0, 2));
+                // Advanced Algerian Shipping rates
+                if (code === 16) cost = (deliveryType === 'home') ? 400 : 250;
+                else if ([9, 35, 42].includes(code)) cost = (deliveryType === 'home') ? 500 : 350; // Central
+                else if ([31, 25, 23, 19].includes(code)) cost = (deliveryType === 'home') ? 600 : 400; // Large Cities
+                else if (code >= 49 || [11, 37, 33].includes(code)) cost = (deliveryType === 'home') ? 1200 : 800; // Far South
+                else cost = (deliveryType === 'home') ? 800 : 500; // Regular
+            }
+
+            const subtotal = cart.reduce((s, i) => s + (i.price * i.qty), 0);
+            document.getElementById('subtotal').innerText = subtotal + ' د.ج';
+            document.getElementById('shipping-cost').innerText = cost + ' د.ج';
+            document.getElementById('total-price').innerText = (subtotal + cost) + ' د.ج';
+        }
+
+        function checkout() {
+            const name = document.getElementById('customer-name').value;
+            const phone = document.getElementById('customer-phone').value;
+            const wilaya = document.getElementById('wilaya').value;
+            const commune = document.getElementById('commune').value;
+            const delType = document.querySelector('input[name="delivery-type"]:checked').value === 'home' ? 'توصيل للمنزل 🏠' : 'استلام من المكتب 🏢';
+            
+            if (cart.length === 0) return alert('السلة فارغة!');
+            if (!name || !phone || !wilaya || !commune) return alert('يرجى إكمال بيانات الشحن (الاسم، الهاتف، الولاية والبلدية)!');
+
+            const msg = encodeURIComponent(
+                `🛍️ *طلب جديد من Smily Dresses*\n\n` +
+                `👤 *العميل:* ${name}\n` +
+                `📞 *الهاتف:* ${phone}\n` +
+                `📍 *الولاية:* ${wilaya}\n` +
+                `🏘️ *البلدية:* ${commune}\n` +
+                `🚚 *نوع الشحن:* ${delType}\n\n` +
+                `📦 *المنتجات:*\n` + 
+                cart.map(i => `- ${i.name} [${i.size}] x${i.qty} (${i.price * i.qty} دج)`).join('\n') +
+                `\n\n💰 *الإجمالي النهائي:* ${document.getElementById('total-price').innerText}`
+            );
+
+            window.open(`https://wa.me/213563413607?text=${msg}`, '_blank');
+        }
+
+        function notify(text) {
+            const d = document.createElement('div');
+            d.className = "fixed top-24 left-1/2 -translate-x-1/2 bg-gray-900 text-white px-8 py-3 rounded-2xl z-[3000] font-bold shadow-2xl animate-bounce";
+            d.innerHTML = `<i class="fas fa-check-circle text-green-400 mr-2"></i> ${text}`;
+            document.body.appendChild(d);
+            setTimeout(() => d.remove(), 2000);
+        }
+    </script>
+</body>
+</html>
+

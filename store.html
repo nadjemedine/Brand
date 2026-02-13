@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smily Dresses Store</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background-color: #FAFAFA;
+        }
+
+        .active-tab {
+            color: #f472b6 !important;
+            /* Tailwind pink-400 */
+        }
+
+        .nav-item {
+            color: #9ca3af;
+            /* Tailwind gray-400 */
+            transition: all 0.3s;
+        }
+
+        .nav-item:hover {
+            color: #e5e7eb;
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body class="min-h-screen pb-24">
+
+    <!-- Header -->
+    <header
+        class="bg-white/80 backdrop-blur-md sticky top-0 z-50 px-6 py-4 flex items-center justify-between border-b border-gray-50">
+        <div class="w-10"></div>
+        <h1 class="text-xl font-black text-pink-600 tracking-tighter flex items-center gap-2">
+            <span class="w-2 h-2 bg-pink-500 rounded-full animate-pulse"></span>
+            SMILY DRESSES
+        </h1>
+        <div class="relative w-10 flex justify-end">
+            <button onclick="switchTab('cart')" class="relative p-2 hover:bg-pink-50 rounded-full transition-colors">
+                <i data-lucide="shopping-cart" class="text-gray-800"></i>
+                <span id="cart-count-badge"
+                    class="hidden absolute top-0 right-0 bg-pink-500 text-white text-[10px] w-5 h-5 rounded-full flex items-center justify-center font-bold ring-2 ring-white">0</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content Containers -->
+    <main class="max-w-md mx-auto px-4 py-6" id="main-content">
+        <!-- Content will be injected here via JavaScript -->
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav
+        class="fixed bottom-6 left-1/2 -translate-x-1/2 w-[90%] max-w-sm bg-gray-900/95 backdrop-blur-lg rounded-[2rem] py-3 px-8 flex justify-between items-center z-50 shadow-2xl shadow-gray-400">
+        <button onclick="switchTab('home')" id="nav-home" class="nav-item flex flex-col items-center gap-1 active-tab">
+            <i data-lucide="home" size="22"></i>
+            <span class="text-[10px] font-bold">الرئيسية</span>
+        </button>
+        <button onclick="switchTab('shop')" id="nav-shop" class="nav-item flex flex-col items-center gap-1">
+            <i data-lucide="store" size="22"></i>
+            <span class="text-[10px] font-bold">المتجر</span>
+        </button>
+        <button onclick="switchTab('cart')" id="nav-cart" class="nav-item flex flex-col items-center gap-1">
+            <div class="relative">
+                <i data-lucide="shopping-cart" size="22"></i>
+                <div id="nav-cart-dot" class="hidden absolute -top-1 -right-1 w-2 h-2 bg-pink-400 rounded-full"></div>
+            </div>
+            <span class="text-[10px] font-bold">السلة</span>
+        </button>
+    </nav>
+
+    <script>
+        // Data & State
+        const WHATSAPP_NUMBER = "213563413607";
+        let activeTab = 'home';
+        let cart = [];
+        let orderPlaced = false;
+
+        // Shipping rates per wilaya (example data: home price, office price)
+        const shippingData = {
+            "1-Adrar": { home: 1000, office: 600 },
+            "2-Chlef": { home: 600, office: 300 },
+            "3-Laghouat": { home: 800, office: 400 },
+            "4-Oum El Bouaghi": { home: 700, office: 400 },
+            "5-Batna": { home: 700, office: 400 },
+            "6-Béjaïa": { home: 600, office: 350 },
+            "7-Biskra": { home: 800, office: 450 },
+            "8-Béchar": { home: 1000, office: 600 },
+            "9-Blida": { home: 400, office: 250 },
+            "10-Bouira": { home: 500, office: 300 },
+            "11-Tamanrasset": { home: 1200, office: 800 },
+            "12-Tébessa": { home: 800, office: 500 },
+            "13-Tlemcen": { home: 800, office: 500 },
+            "14-Tiaret": { home: 700, office: 400 },
+            "15-Tizi Ouzou": { home: 500, office: 300 },
+            "16-Alger": { home: 300, office: 200 },
+            "17-Djelfa": { home: 700, office: 400 },
+            "18-Jijel": { home: 700, office: 400 },
+            "19-Sétif": { home: 600, office: 350 },
+            "20-Saïda": { home: 800, office: 500 },
+            "21-Skikda": { home: 700, office: 400 },
+            "22-Sidi Bel Abbès": { home: 800, office: 500 },
+            "23-Annaba": { home: 700, office: 400 },
+            "24-Guelma": { home: 700, office: 400 },
+            "25-Constantine": { home: 700, office: 400 },
+            "26-Médéa": { home: 500, office: 300 },
+            "27-Mostaganem": { home: 700, office: 400 },
+            "28-M'Sila": { home: 700, office: 400 },
+            "29-Mascara": { home: 700, office: 400 },
+            "30-Ouargla": { home: 900, office: 550 },
+            "31-Oran": { home: 700, office: 400 },
+            "32-El Bayadh": { home: 900, office: 550 },
+            "33-Illizi": { home: 1500, office: 1000 },
+            "34-Bordj Bou Arréridj": { home: 600, office: 350 },
+            "35-Boumerdès": { home: 400, office: 250 },
+            "36-El Tarf": { home: 800, office: 500 },
+            "37-Tindouf": { home: 1500, office: 1000 },
+            "38-Tissemsilt": { home: 700, office: 400 },
+            "39-El Oued": { home: 900, office: 550 },
+            "40-Khenchela": { home: 800, office: 500 },
+            "41-Souk Ahras": { home: 800, office: 500 },
+            "42-Tipaza": { home: 500, office: 300 },
+            "43-Mila": { home: 700, office: 400 },
+            "44-Aïn Defla": { home: 600, office: 350 },
+            "45-Naâma": { home: 900, office: 600 },
+            "46-Aïn Témouchent": { home: 800, office: 500 },
+            "47-Ghardaïa": { home: 900, office: 550 },
+            "48-Relizane": { home: 700, office: 400 },
+            "49-El M'Ghair": { home: 900, office: 600 },
+            "50-El Meniaa": { home: 1000, office: 700 },
+            "51-Ouled Djellal": { home: 900, office: 600 },
+            "52-Bordj Baji Mokhtar": { home: 1500, office: 1000 },
+            "53-Béni Abbès": { home: 1200, office: 800 },
+            "54-Timimoun": { home: 1200, office: 800 },
+            "55-Touggourt": { home: 900, office: 600 },
+            "56-Djanet": { home: 1500, office: 1000 },
+            "57-In Salah": { home: 1200, office: 800 },
+            "58-In Guezzam": { home: 1500, office: 1000 }
+        };
+
+        const products = [
+            { id: 1, name: "فستان", price: 8000, desc: "فستان ناعم ومريح مناسب للخروجات اليومية", image: "image1.jpg" },
+            { id: 2, name: "فستان", price: 8000, desc: "أناقة لا مثيل لها للمناسبات الخاصة", image: "image2.jpg" },
+            { id: 3, name: "فستان", price: 8000, desc: "تصميم مريح وألوان جذابة", image: "image3.jpg" },
+            { id: 4, name: "فستان", price: 8000, desc: "خامات عالية الجودة وتطريز يدوي", image: "image4.jpg" }
+        ];
+
+        // Functions
+        function switchTab(tab) {
+            activeTab = tab;
+            render();
+            updateNav();
+        }
+
+        function addToCart(productId, size) {
+            const product = products.find(p => p.id === productId);
+            const existing = cart.find(item => item.id === productId && item.size === size);
+
+            if (existing) {
+                existing.qty += 1;
+            } else {
+                cart.push({ ...product, size, qty: 1 });
+            }
+            updateCartUI();
+            showToast("تمت الإضافة للسلة");
+        }
+
+        function updateQty(id, size, delta) {
+            const item = cart.find(i => i.id === id && i.size === size);
+            if (item) {
+                item.qty = Math.max(1, item.qty + delta);
+                render();
+            }
+        }
+
+        function removeFromCart(id, size) {
+            cart = cart.filter(i => !(i.id === id && i.size === size));
+            updateCartUI();
+            render();
+        }
+
+        function updateCartUI() {
+            const count = cart.reduce((acc, item) => acc + item.qty, 0);
+            const badge = document.getElementById('cart-count-badge');
+            const dot = document.getElementById('nav-cart-dot');
+
+            if (count > 0) {
+                badge.innerText = count;
+                badge.classList.remove('hidden');
+                dot.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+                dot.classList.add('hidden');
+            }
+        }
+
+        // Updated function to calculate and update UI for shipping prices
+        function updateShippingDisplay() {
+            const wilaya = document.getElementById('order-wilaya').value;
+            const rates = shippingData[wilaya];
+
+            document.getElementById('home-shipping-cost').innerText = `${rates.home} د.ج`;
+            document.getElementById('office-shipping-cost').innerText = `${rates.office} د.ج`;
+
+            updateTotalDisplay();
+        }
+
+        function updateTotalDisplay() {
+            const wilaya = document.getElementById('order-wilaya').value;
+            const addressType = document.querySelector('input[name="addressType"]:checked').value;
+            const shippingCost = shippingData[wilaya][addressType];
+            const productsTotal = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
+            const total = productsTotal + shippingCost;
+
+            const totalBtn = document.getElementById('final-order-btn');
+            if (totalBtn) {
+                totalBtn.innerHTML = `تأكيد الطلب (${total} د.ج) <i data-lucide="message-circle"></i>`;
+                lucide.createIcons();
+            }
+        }
+
+        function handleOrder() {
+            const name = document.getElementById('order-name').value;
+            const phone = document.getElementById('order-phone').value;
+            const wilaya = document.getElementById('order-wilaya').value;
+            const address = document.getElementById('order-address').value;
+            const addressType = document.querySelector('input[name="addressType"]:checked').value;
+
+            if (!name || !phone || !address) {
+                alert("يرجى ملء جميع البيانات المطلوبة");
+                return;
+            }
+
+            const shippingCost = shippingData[wilaya][addressType];
+            const productsTotal = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
+            const total = productsTotal + shippingCost;
+
+            let message = `*طلب جديد من متجر Smily Dresses*\n\n`;
+            message += `*الاسم:* ${name}\n`;
+            message += `*الهاتف:* ${phone}\n`;
+            message += `*الولاية:* ${wilaya}\n`;
+            message += `*نوع التوصيل:* ${addressType === 'home' ? 'للمنزل' : 'للمكتب'}\n`;
+            message += `*العنوان:* ${address}\n\n`;
+            message += `*المنتجات:*\n`;
+
+            cart.forEach(item => {
+                message += `- ${item.name} (${item.size}) x${item.qty} = ${item.price * item.qty} د.ج\n`;
+            });
+
+            message += `\n*سعر الشحن:* ${shippingCost} د.ج`;
+            message += `\n*الإجمالي النهائي:* ${total} د.ج`;
+
+            const encodedMessage = encodeURIComponent(message);
+            window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodedMessage}`, '_blank');
+            orderPlaced = true;
+            render();
+        }
+
+        function showToast(msg) {
+            console.log(msg);
+        }
+
+        // Templates
+        function renderHome() {
+            return `
+                <div class="animate-fade-in text-right">
+                    <div class="bg-gradient-to-br from-pink-500 to-rose-400 rounded-3xl p-8 mb-8 text-white shadow-xl shadow-pink-100 overflow-hidden relative">
+                        <div class="relative z-10">
+                            <h1 class="text-3xl font-black mb-3 text-right">Smily Dresses</h1>
+                            <p class="text-pink-50 opacity-90 text-lg leading-relaxed max-w-xs">أناقتك تبدأ من هنا. اكتشفي مجموعتنا الحصرية والفريدة.</p>
+                        </div>
+                        <div class="absolute -bottom-10 -left-10 w-40 h-40 bg-white opacity-10 rounded-full"></div>
+                    </div>
+
+                    <h2 class="text-xl font-bold mb-6 pr-2 border-r-4 border-pink-500 mr-1">لماذا تتسوقين معنا؟</h2>
+                    
+                    <div class="grid grid-cols-1 gap-4">
+                        <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-row-reverse items-center gap-4 group hover:border-pink-200 transition-all">
+                            <div class="bg-pink-100 p-3 rounded-xl text-pink-600">
+                                <i data-lucide="truck"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="font-bold text-gray-800">توصيل لكل الولايات</h3>
+                                <p class="text-gray-500 text-sm">نصلك أينما كنتِ في الـ 58 ولاية بأسعار تنافسية.</p>
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-row-reverse items-center gap-4 group hover:border-pink-200 transition-all">
+                            <div class="bg-blue-100 p-3 rounded-xl text-blue-600">
+                                <i data-lucide="shield-check"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="font-bold text-gray-800">ضمان الجودة</h3>
+                                <p class="text-gray-500 text-sm">أقمشة مختارة بعناية وخياطة احترافية تليق بكِ.</p>
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-row-reverse items-center gap-4 group hover:border-pink-200 transition-all">
+                            <div class="bg-amber-100 p-3 rounded-xl text-amber-600">
+                                <i data-lucide="star"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="font-bold text-gray-800">خدمة متميزة</h3>
+                                <p class="text-gray-500 text-sm">دعم فني متواصل لتلبية جميع استفساراتكم.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderShop() {
+            let html = '<div class="grid grid-cols-1 gap-6 animate-fade-in">';
+            products.forEach(p => {
+                html += `
+                    <div class="bg-white rounded-3xl shadow-sm overflow-hidden border border-gray-100 flex flex-col">
+                        <div class="h-72 relative bg-gray-100">
+                            <img src="${p.image}" class="w-full h-full object-contain">
+                            <div class="absolute top-4 left-4 bg-white/90 backdrop-blur px-4 py-1.5 rounded-full text-pink-600 font-black shadow-sm">
+                                ${p.price} د.ج
+                            </div>
+                        </div>
+                        <div class="p-5 text-right">
+                            <h3 class="text-xl font-bold text-gray-800 mb-1">${p.name}</h3>
+                            <p class="text-gray-500 text-sm mb-5 leading-relaxed">${p.desc}</p>
+                            
+                            <div class="mb-6 flex flex-row-reverse justify-start gap-2" id="sizes-${p.id}">
+                                ${['S', 'M', 'L', 'XL', 'XXL'].map(size => `
+                                    <button onclick="selectSize(${p.id}, '${size}')" id="btn-${p.id}-${size}" class="size-btn-${p.id} w-11 h-11 rounded-xl border-2 font-bold transition-all ${size === 'M' ? 'bg-pink-500 text-white border-pink-500' : 'bg-white text-gray-400 border-gray-100'}">
+                                        ${size}
+                                    </button>
+                                `).join('')}
+                                <input type="hidden" id="selected-size-${p.id}" value="M">
+                            </div>
+                            
+                            <button onclick="addToCart(${p.id}, document.getElementById('selected-size-${p.id}').value)" class="w-full bg-gray-900 text-white py-4 rounded-2xl font-bold flex items-center justify-center gap-3 active:scale-95 transition-all">
+                                إضافة للسلة <i data-lucide="shopping-cart" size="20"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+            html += '</div>';
+            return html;
+        }
+
+        function selectSize(productId, size) {
+            document.getElementById(`selected-size-${productId}`).value = size;
+            document.querySelectorAll(`.size-btn-${productId}`).forEach(btn => {
+                btn.classList.remove('bg-pink-500', 'text-white', 'border-pink-500');
+                btn.classList.add('bg-white', 'text-gray-400', 'border-gray-100');
+            });
+            const selectedBtn = document.getElementById(`btn-${productId}-${size}`);
+            selectedBtn.classList.add('bg-pink-500', 'text-white', 'border-pink-500');
+            selectedBtn.classList.remove('bg-white', 'text-gray-400', 'border-gray-100');
+        }
+
+        function renderCart() {
+            if (orderPlaced) {
+                return `
+                    <div class="p-8 text-center animate-fade-in h-[60vh] flex flex-col justify-center">
+                        <div class="w-24 h-24 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <i data-lucide="check-circle" size="56"></i>
+                        </div>
+                        <h2 class="text-3xl font-black mb-3">تم تجهيز طلبك!</h2>
+                        <p class="text-gray-500 mb-8 px-4">لقد قمنا بتوجيه طلبك عبر الواتساب لتأكيد العملية والبدء في الشحن.</p>
+                        <button onclick="resetOrder()" class="bg-gray-900 text-white px-10 py-4 rounded-2xl font-bold">العودة للتسوق</button>
+                    </div>
+                `;
+            }
+
+            if (cart.length === 0) {
+                return `
+                    <div class="text-center py-24 flex flex-col items-center gap-4 animate-fade-in">
+                        <div class="bg-gray-100 p-6 rounded-full text-gray-300"><i data-lucide="shopping-cart" size="64"></i></div>
+                        <p class="text-gray-400 font-medium text-lg">لم تقومي بإضافة أي شيء للسلة بعد</p>
+                        <button onclick="switchTab('shop')" class="text-pink-600 font-bold underline">اذهبي للمتجر</button>
+                    </div>
+                `;
+            }
+
+            const initialWilaya = Object.keys(shippingData)[0];
+            const initialRates = shippingData[initialWilaya];
+            const productsTotal = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
+            const initialTotal = productsTotal + initialRates.home;
+
+            return `
+                <div class="text-right animate-fade-in">
+                    <h2 class="text-2xl font-black mb-8 px-2">سلة المشتريات</h2>
+                    <div class="space-y-4 mb-8">
+                        ${cart.map(item => `
+                            <div class="flex flex-row-reverse items-center gap-4 bg-white p-4 rounded-3xl shadow-sm border border-gray-100">
+                                <div class="w-20 h-20 bg-gray-50 rounded-2xl overflow-hidden shrink-0">
+                                </div>
+                                <div class="flex-1">
+                                    <h4 class="font-bold text-gray-800">${item.name}</h4>
+                                    <p class="text-xs text-gray-400 font-bold">المقاس: ${item.size}</p>
+                                    <p class="font-black text-pink-600 mt-1">${item.price} د.ج</p>
+                                </div>
+                                <div class="flex flex-col items-center gap-2">
+                                    <div class="flex items-center gap-3 bg-gray-50 rounded-xl px-2 py-1 text-sm">
+                                        <button onclick="updateQty(${item.id}, '${item.size}', 1)"><i data-lucide="plus" size="14"></i></button>
+                                        <span class="font-bold">${item.qty}</span>
+                                        <button onclick="updateQty(${item.id}, '${item.size}', -1)"><i data-lucide="minus" size="14"></i></button>
+                                    </div>
+                                    <button onclick="removeFromCart(${item.id}, '${item.size}')" class="text-gray-300 hover:text-red-500"><i data-lucide="trash-2" size="18"></i></button>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+
+                    <div class="bg-white p-6 rounded-[2.5rem] shadow-xl border border-gray-100 space-y-6">
+                        <h3 class="font-bold text-xl border-b border-gray-50 pb-4 text-right">معلومات الشحن والدفع</h3>
+                        <div class="space-y-4">
+                            <input type="text" id="order-name" class="w-full p-4 bg-gray-50 border-none rounded-2xl text-right focus:ring-2 focus:ring-pink-200 outline-none" placeholder="الاسم الكامل">
+                            <input type="tel" id="order-phone" class="w-full p-4 bg-gray-50 border-none rounded-2xl text-right focus:ring-2 focus:ring-pink-200 outline-none" placeholder="رقم الهاتف">
+                            <div class="space-y-1">
+                                <label class="text-xs text-gray-400 mr-2 font-bold">الولاية</label>
+                                <select id="order-wilaya" onchange="updateShippingDisplay()" class="w-full p-4 bg-gray-50 border-none rounded-2xl text-right focus:ring-2 focus:ring-pink-200 outline-none">
+                                    ${Object.keys(shippingData).map(w => `<option value="${w}">${w}</option>`).join('')}
+                                </select>
+                            </div>
+                            <div class="grid grid-cols-2 gap-3">
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="addressType" value="home" checked onchange="updateTotalDisplay()" class="hidden peer">
+                                    <div class="p-4 rounded-2xl border-2 text-center transition-all peer-checked:bg-pink-50 peer-checked:border-pink-500 bg-gray-50 border-transparent text-gray-400">
+                                        <div class="font-bold text-sm">توصيل للمنزل</div>
+                                        <div id="home-shipping-cost" class="text-[10px] font-black mt-1">${initialRates.home} د.ج</div>
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="addressType" value="office" onchange="updateTotalDisplay()" class="hidden peer">
+                                    <div class="p-4 rounded-2xl border-2 text-center transition-all peer-checked:bg-pink-50 peer-checked:border-pink-500 bg-gray-50 border-transparent text-gray-400">
+                                        <div class="font-bold text-sm">توصيل للمكتب</div>
+                                        <div id="office-shipping-cost" class="text-[10px] font-black mt-1">${initialRates.office} د.ج</div>
+                                    </div>
+                                </label>
+                            </div>
+                            <textarea id="order-address" class="w-full p-4 bg-gray-50 border-none rounded-2xl h-24 text-right focus:ring-2 focus:ring-pink-200 outline-none" placeholder="العنوان بالتفصيل..."></textarea>
+                        </div>
+                        <button id="final-order-btn" onclick="handleOrder()" class="w-full bg-[#25D366] text-white py-4 rounded-2xl font-black text-lg flex items-center justify-center gap-3 active:scale-95 transition-all">
+                            تأكيد الطلب (${initialTotal} د.ج) <i data-lucide="message-circle"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function resetOrder() {
+            orderPlaced = false;
+            cart = [];
+            updateCartUI();
+            switchTab('home');
+        }
+
+        function updateNav() {
+            document.querySelectorAll('.nav-item').forEach(btn => btn.classList.remove('active-tab'));
+            document.getElementById(`nav-${activeTab}`).classList.add('active-tab');
+        }
+
+        function render() {
+            const container = document.getElementById('main-content');
+            if (activeTab === 'home') container.innerHTML = renderHome();
+            else if (activeTab === 'shop') container.innerHTML = renderShop();
+            else if (activeTab === 'cart') container.innerHTML = renderCart();
+
+            lucide.createIcons();
+        }
+
+        window.onload = () => {
+            render();
+            lucide.createIcons();
+        };
+
+    </script>
+</body>
+
+</html>

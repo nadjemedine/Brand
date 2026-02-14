@@ -340,35 +340,55 @@
         }
 
         function updateCartUI() {
-            const container = document.getElementById('cart-items');
-            document.getElementById('cart-count').innerText = cart.reduce((s, i) => s + i.qty, 0);
-            
-            if (cart.length === 0) {
-                container.innerHTML = `<div class="text-center py-20"><i class="fas fa-shopping-cart text-5xl text-gray-100 mb-4"></i><p class="text-gray-400">سلتك فارغة، تسوقي الآن!</p></div>`;
-            } else {
-                container.innerHTML = cart.map((item, index) => `
-                    <div class="glass-card p-4 flex gap-4 items-center">
-                        <img src="${item.img}" onerror="this.src='https://via.placeholder.com/100'" class="w-20 h-24 object-cover rounded-xl shadow-sm">
-                        <div class="flex-1">
-                            <h4 class="font-bold text-gray-800">${item.name}</h4>
-                            <div class="flex items-center gap-2 text-xs font-bold text-gray-400 mt-1 uppercase">
-                                <span class="bg-pink-50 text-pink-500 px-2 py-1 rounded-md">${item.size}</span>
-                                <span>الكمية: ${item.qty}</span>
-                            </div>
-                            <p class="text-pink-600 font-black mt-2">${item.price * item.qty} د.ج</p>
-                        </div>
-                        <button onclick="removeFromCart(${index})" class="text-red-300 hover:text-red-500 p-2"><i class="fas fa-trash-alt"></i></button>
+    const container = document.getElementById('cart-items');
+    document.getElementById('cart-count').innerText = cart.reduce((s, i) => s + i.qty, 0);
+    
+    if (cart.length === 0) {
+        container.innerHTML = `<div class="text-center py-20"><i class="fas fa-shopping-cart text-5xl text-gray-100 mb-4"></i><p class="text-gray-400">سلتك فارغة، تسوقي الآن!</p></div>`;
+    } else {
+        container.innerHTML = cart.map((item, index) => `
+            <div class="glass-card p-4 flex gap-4 items-center">
+                <img src="${item.img}" class="w-20 h-24 object-cover rounded-xl shadow-sm">
+                <div class="flex-1">
+                    <h4 class="font-bold text-gray-800">${item.name}</h4>
+                    <div class="flex items-center gap-2 text-xs font-bold text-gray-400 mt-1 uppercase">
+                        <span class="bg-pink-50 text-pink-500 px-2 py-1 rounded-md">${item.size}</span>
                     </div>
-                `).join('');
-            }
-            calculateShipping();
-        }
+                    
+                    <!-- أزرار التحكم بالكمية - هنا الإضافة الجديدة -->
+                    <div class="flex items-center gap-3 mt-3">
+                        <button onclick="changeQty(${index}, -1)" class="bg-gray-100 hover:bg-gray-200 w-8 h-8 rounded-lg flex items-center justify-center font-bold text-gray-600 transition-all">
+                            <i class="fas fa-minus text-xs"></i>
+                        </button>
+                        <span class="font-black text-lg text-gray-800 w-8 text-center">${item.qty}</span>
+                        <button onclick="changeQty(${index}, 1)" class="bg-pink-500 hover:bg-pink-600 w-8 h-8 rounded-lg flex items-center justify-center font-bold text-white transition-all">
+                            <i class="fas fa-plus text-xs"></i>
+                        </button>
+                    </div>
+                    
+                    <p class="text-pink-600 font-black mt-2">${item.price * item.qty} د.ج</p>
+                </div>
+                <button onclick="removeFromCart(${index})" class="text-red-300 hover:text-red-500 p-2"><i class="fas fa-trash-alt"></i></button>
+            </div>
+        `).join('');
+    }
+    calculateShipping();
+}
 
         function removeFromCart(index) {
             cart.splice(index, 1);
             updateCartUI();
         }
-
+function changeQty(index, change) {
+    cart[index].qty += change;
+    
+    // إذا وصلت الكمية لـ 0، احذف المنتج
+    if (cart[index].qty <= 0) {
+        cart.splice(index, 1);
+    }
+    
+    updateCartUI();
+}
         function calculateShipping() {
             const wilaya = document.getElementById('wilaya').value;
             const deliveryType = document.querySelector('input[name="delivery-type"]:checked').value;
